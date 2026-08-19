@@ -1,0 +1,16 @@
+{
+  "preset": "react-native",
+  "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"],
+  "testEnvironment": "node",
+  "testMatch": ["**/__tests__/**/*.test.ts", "**/__tests__/**/*.test.tsx"],
+  "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json"],
+  "transform": {
+    "^.+\\.tsx?$": "babel-jest"
+  },
+  "collectCoverageFrom": [
+    "utils/**/*.ts",
+    "services/**/*.ts",
+    "features/**/*.ts",
+    "!**/*.d.ts"
+  ]
+}
