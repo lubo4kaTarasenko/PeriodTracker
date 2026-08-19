@@ -10,6 +10,7 @@ import {
   SelectedRanges
 } from "./components";
 import { useCalendarMonth, usePeriodDays } from "./features/periods";
+import { backupService } from "./services";
 import {
   buildMonthDays,
   getTodayKey,
@@ -21,7 +22,7 @@ import {
  */
 export default function App() {
   // State management
-  const { periodDays, loading, loadPeriodDays, addDateRange, clearPeriodDays } =
+  const { periodDays, loading, loadPeriodDays, savePeriodDays, addDateRange, clearPeriodDays } =
     usePeriodDays();
   const { visibleMonth, shiftMonth } = useCalendarMonth();
   const [rangeStart, setRangeStart] = React.useState<string | null>(null);
@@ -70,6 +71,60 @@ export default function App() {
     ]);
   };
 
+  const handleBackup = () => {
+    Alert.alert(
+      "Create readable backup?",
+      "The JSON file will contain your period dates without encryption. Save it somewhere private.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Continue",
+          onPress: async () => {
+            try {
+              await backupService.shareBackup(periodDays);
+            } catch (error) {
+              const message = error instanceof Error ? error.message : "Could not create the backup.";
+              Alert.alert("Backup failed", message);
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const handleRestore = async () => {
+    try {
+      const restoredDays = await backupService.pickBackup();
+      if (!restoredDays) {
+        return;
+      }
+
+      const restoredRanges = groupConsecutiveDates(restoredDays);
+      Alert.alert(
+        "Restore backup?",
+        `This will replace the periods currently saved on this phone with ${restoredRanges.length} period${restoredRanges.length === 1 ? "" : "s"}.`,
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Restore",
+            onPress: async () => {
+              try {
+                setRangeStart(null);
+                await savePeriodDays(restoredDays);
+                Alert.alert("Backup restored", "Your saved periods are now available on this phone.");
+              } catch {
+                Alert.alert("Restore failed", "The backup could not be saved on this phone.");
+              }
+            }
+          }
+        ]
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not read the selected file.";
+      Alert.alert("Restore failed", message);
+    }
+  };
+
   // Render loading state
   if (loading) {
     return <LoadingScreen />;
@@ -98,6 +153,8 @@ export default function App() {
         <SelectedRanges ranges={selectedRanges} pendingStart={rangeStart} />
 
         <ActionButtons
+          onBackup={handleBackup}
+          onRestore={handleRestore}
           onClear={handleClearAll}
         />
       </ScrollView>

@@ -8,7 +8,7 @@ A React Native Android app for tracking menstrual periods using a simple calenda
 - Easy selection of period dates (individual days or ranges)
 - Visual highlighting of recorded period days
 - Local-first data storage (no server sync)
-- Optional integration with device/Google Calendar
+- Readable JSON backup and restore through Android's file picker
 - Android-first UI design
 
 ## Project Structure
@@ -20,7 +20,8 @@ period-tracker/
 │   └── periods/        # Period tracking hooks
 ├── services/            # Business logic services
 │   ├── storageService.ts    # Local storage management
-│   └── calendarService.ts   # Calendar integration
+│   ├── backupFormat.ts      # Backup serialization and validation
+│   └── backupService.ts     # Android file sharing and selection
 ├── types/              # TypeScript type definitions
 ├── utils/              # Utility functions
 │   └── dateUtils.ts    # Date manipulation helpers
@@ -71,25 +72,26 @@ npm test
 - **Expo** - Development and build platform
 - **TypeScript** - Type-safe JavaScript
 - **AsyncStorage** - Local data persistence
-- **Expo Calendar** - Device calendar integration
+- **Expo FileSystem, Sharing, and Document Picker** - Backup export and restore
 
-## Google Calendar Integration
+## Backing Up and Moving to a New Phone
 
-The app can sync period events to Google Calendar through the device's calendar system:
+Period data is stored locally by default. To keep a copy or move it to another phone:
 
-1. Connect your Google account in your phone's calendar settings
-2. Set your Google calendar as the writable calendar
-3. In the Period Tracker app, tap "Add to phone / Google Calendar"
-4. Events will automatically sync to your Google Calendar
+1. Tap **Back up** in the app.
+2. Choose Google Drive or another private location from Android's share sheet.
+3. On the new phone, install and open the app.
+4. Tap **Restore** and choose the saved JSON file.
+5. Confirm that the locally saved periods should be replaced.
 
-**Note**: This is completely optional. All period data stays on your device by default.
+The backup is deliberately readable JSON and is not encrypted. Anyone with access to the file can read the period dates, so save it somewhere private. The app does not connect directly to Google Drive and does not require a backend or account.
 
 ## Privacy
 
 - Period data is stored locally on the Android device only
-- No data is sent to any server unless you explicitly sync to Google Calendar
+- No data is sent anywhere unless you explicitly share a backup file
 - No analytics or tracking of period dates
-- Sync to Google Calendar is opt-in
+- Backup and restore are always initiated by the user
 
 ## Development
 
