@@ -1,13 +1,16 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { storageService } from "../../services/storageService";
-
-jest.mock("@react-native-async-storage/async-storage");
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const mockAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
 
 describe("storageService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(console, "error").mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe("loadPeriodDays", () => {

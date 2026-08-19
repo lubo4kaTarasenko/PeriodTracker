@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { storageService } from "../../services/storageService";
-import { getTodayKey } from "../../utils/dateUtils";
+import { getDateKeysInRange, getTodayKey } from "../../utils/dateUtils";
 
 /**
  * Hook for managing period day state and operations
@@ -29,22 +29,17 @@ export function usePeriodDays() {
     []
   );
 
-  const toggleDay = useCallback(
-    async (dayKey: string): Promise<boolean> => {
+  const addDateRange = useCallback(
+    async (startKey: string, endKey: string): Promise<boolean> => {
       const todayKey = getTodayKey();
 
-      // Only allow toggling past or today's dates
-      if (dayKey > todayKey) {
-        console.warn("Cannot toggle future dates");
+      if (startKey > todayKey || endKey > todayKey) {
+        console.warn("Cannot add future dates");
         return false;
       }
 
       const nextSet = new Set(periodDays);
-      if (nextSet.has(dayKey)) {
-        nextSet.delete(dayKey);
-      } else {
-        nextSet.add(dayKey);
-      }
+      getDateKeysInRange(startKey, endKey).forEach((key) => nextSet.add(key));
 
       await savePeriodDays([...nextSet].sort());
       return true;
@@ -61,7 +56,7 @@ export function usePeriodDays() {
     loading,
     loadPeriodDays,
     savePeriodDays,
-    toggleDay,
+    addDateRange,
     clearPeriodDays
   };
 }

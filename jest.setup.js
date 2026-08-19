@@ -1,2 +1,3 @@
-// Jest setup file for test configuration
-// Add any global test setup here
+jest.mock("@react-native-async-storage/async-storage", () =>
+	require("@react-native-async-storage/async-storage/jest/async-storage-mock")
+);

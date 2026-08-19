@@ -29,6 +29,23 @@ export function addDays(date: Date, days: number): Date {
 }
 
 /**
+ * Return every ISO date key in an inclusive date range.
+ */
+export function getDateKeysInRange(startKey: string, endKey: string): string[] {
+  const start = fromDateKey(startKey);
+  const end = fromDateKey(endKey);
+  const first = start <= end ? start : end;
+  const last = start <= end ? end : start;
+  const keys: string[] = [];
+
+  for (let current = first; current <= last; current = addDays(current, 1)) {
+    keys.push(toDateKey(current));
+  }
+
+  return keys;
+}
+
+/**
  * Get a localized month label (e.g., "August 2026")
  */
 export function monthLabel(date: Date): string {

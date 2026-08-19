@@ -2,6 +2,7 @@ import {
   addDays,
   buildMonthDays,
   fromDateKey,
+  getDateKeysInRange,
   getTodayKey,
   groupConsecutiveDates,
   toDateKey
@@ -58,6 +59,31 @@ describe("dateUtils", () => {
       const result = addDays(date, -5);
       expect(result.getDate()).toBe(13);
       expect(result.getMonth()).toBe(7); // Still August
+    });
+  });
+
+  describe("getDateKeysInRange", () => {
+    it("returns every date between inclusive endpoints", () => {
+      const result = getDateKeysInRange("2026-08-12", "2026-08-14");
+
+      expect(result).toEqual(["2026-08-12", "2026-08-13", "2026-08-14"]);
+    });
+
+    it("handles endpoints selected in reverse order", () => {
+      const result = getDateKeysInRange("2026-08-14", "2026-08-12");
+
+      expect(result).toEqual(["2026-08-12", "2026-08-13", "2026-08-14"]);
+    });
+
+    it("handles ranges spanning two months", () => {
+      const result = getDateKeysInRange("2026-08-30", "2026-09-02");
+
+      expect(result).toEqual([
+        "2026-08-30",
+        "2026-08-31",
+        "2026-09-01",
+        "2026-09-02"
+      ]);
     });
   });
 

@@ -8,13 +8,19 @@ const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 interface CalendarGridProps {
   days: CalendarDay[];
   selectedDays: Set<string>;
+  rangeStart: string | null;
   onDayPress: (day: CalendarDay) => void;
 }
 
 /**
  * Calendar grid component displaying a month's days
  */
-export const CalendarGrid: React.FC<CalendarGridProps> = ({ days, selectedDays, onDayPress }) => {
+export const CalendarGrid: React.FC<CalendarGridProps> = ({
+  days,
+  selectedDays,
+  rangeStart,
+  onDayPress
+}) => {
   const todayKey = useMemo(() => getTodayKey(), []);
 
   return (
@@ -30,6 +36,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ days, selectedDays, 
       <View style={styles.grid}>
         {days.map((day) => {
           const isSelected = selectedDays.has(day.key);
+          const isRangeStart = day.key === rangeStart;
           const isToday = day.key === todayKey;
           const isFuture = day.key > todayKey;
 
@@ -42,6 +49,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ days, selectedDays, 
                 !day.inMonth && styles.dayOutsideMonth,
                 isToday && styles.today,
                 isSelected && styles.selectedDay,
+                isRangeStart && styles.rangeStart,
                 isFuture && styles.futureDay
               ]}
             >
@@ -97,6 +105,10 @@ const styles = StyleSheet.create({
   selectedDay: {
     backgroundColor: "#c43d6d",
     borderColor: "#c43d6d"
+  },
+  rangeStart: {
+    borderColor: "#7b1744",
+    borderWidth: 3
   },
   today: {
     borderColor: "#2a1820",

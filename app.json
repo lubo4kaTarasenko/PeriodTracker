@@ -6,17 +6,8 @@
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "android": {
-      "edgeToEdgeEnabled": true,
-      "package": "com.periodtracker.app"
-    },
-    "plugins": [
-      [
-        "expo-calendar",
-        {
-          "calendarPermission": "Period Tracker needs calendar access to add period days to your calendar.",
-          "writeOnlyCalendarPermission": "Period Tracker needs permission to add period days to your calendar."
-        }
-      ]
-    ]
+      "package": "com.periodtracker.app",
+      "ndkVersion": "30.0.15729638"
+    }
   }
 }

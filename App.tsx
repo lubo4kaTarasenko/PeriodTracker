@@ -4,14 +4,12 @@ import { Alert, SafeAreaView, ScrollView, StyleSheet } from "react-native";
 import {
   ActionButtons,
   CalendarGrid,
-  CalendarInfo,
   Header,
   LoadingScreen,
   MonthNavigator,
   SelectedRanges
 } from "./components";
 import { useCalendarMonth, usePeriodDays } from "./features/periods";
-import { calendarService } from "./services";
 import {
   buildMonthDays,
   getTodayKey,
@@ -23,10 +21,10 @@ import {
  */
 export default function App() {
   // State management
-  const { periodDays, loading, loadPeriodDays, savePeriodDays, toggleDay, clearPeriodDays } =
+  const { periodDays, loading, loadPeriodDays, addDateRange, clearPeriodDays } =
     usePeriodDays();
   const { visibleMonth, shiftMonth } = useCalendarMonth();
-  const [syncing, setSyncing] = React.useState(false);
+  const [rangeStart, setRangeStart] = React.useState<string | null>(null);
 
   // Computed values
   const todayKey = useMemo(() => getTodayKey(), []);
@@ -40,33 +38,21 @@ export default function App() {
   }, [loadPeriodDays]);
 
   // Handlers
-  const handleDayPress = async (day: typeof monthDays[0]) => {
+  const handleDayPress = async (day: (typeof monthDays)[number]) => {
     if (day.key > todayKey) {
-      Alert.alert("Past days only", "Use this calendar to record period days that already happened.");
+      Alert.alert("Past days only", "Choose dates that already happened.");
       return;
     }
 
-    const success = await toggleDay(day.key);
-    if (!success) {
-      Alert.alert("Error", "Could not toggle period day");
+    if (!rangeStart) {
+      setRangeStart(day.key);
+      return;
     }
-  };
 
-  const handleAddToCalendar = async () => {
-    setSyncing(true);
-    try {
-      const result = await calendarService.addRangesToDeviceCalendar(selectedRanges);
-
-      if (result.success) {
-        Alert.alert("Added to calendar", result.message);
-      } else {
-        Alert.alert("Error", result.message);
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      Alert.alert("Error", `Failed to add to calendar: ${errorMessage}`);
-    } finally {
-      setSyncing(false);
+    const success = await addDateRange(rangeStart, day.key);
+    setRangeStart(null);
+    if (!success) {
+      Alert.alert("Error", "Could not save this period range");
     }
   };
 
@@ -77,6 +63,7 @@ export default function App() {
         text: "Clear",
         style: "destructive",
         onPress: async () => {
+          setRangeStart(null);
           await clearPeriodDays();
         }
       }
@@ -93,7 +80,7 @@ export default function App() {
     <SafeAreaView style={styles.screen}>
       <StatusBar style="dark" />
       <ScrollView contentContainerStyle={styles.content}>
-        <Header periodDayCount={periodDays.length} />
+        <Header periodCount={selectedRanges.length} />
 
         <MonthNavigator
           visibleMonth={visibleMonth}
@@ -104,18 +91,15 @@ export default function App() {
         <CalendarGrid
           days={monthDays}
           selectedDays={periodSet}
+          rangeStart={rangeStart}
           onDayPress={handleDayPress}
         />
 
-        <SelectedRanges ranges={selectedRanges} />
+        <SelectedRanges ranges={selectedRanges} pendingStart={rangeStart} />
 
         <ActionButtons
-          onAddToCalendar={handleAddToCalendar}
           onClear={handleClearAll}
-          isLoading={syncing}
         />
-
-        <CalendarInfo />
       </ScrollView>
     </SafeAreaView>
   );

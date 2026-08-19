@@ -2,22 +2,22 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 interface HeaderProps {
-  periodDayCount: number;
+  periodCount: number;
 }
 
 /**
  * Header component showing the app title and period day count
  */
-export const Header: React.FC<HeaderProps> = ({ periodDayCount }) => {
+export const Header: React.FC<HeaderProps> = ({ periodCount }) => {
   return (
     <View style={styles.header}>
       <View>
         <Text style={styles.eyebrow}>Period Tracker</Text>
-        <Text style={styles.title}>Track past period days</Text>
+        <Text style={styles.title}>Track your periods</Text>
       </View>
       <View style={styles.countBadge}>
-        <Text style={styles.count}>{periodDayCount}</Text>
-        <Text style={styles.countLabel}>days</Text>
+        <Text style={styles.count}>{periodCount}</Text>
+        <Text style={styles.countLabel}>periods</Text>
       </View>
     </View>
   );
